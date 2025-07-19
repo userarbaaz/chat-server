@@ -21,6 +21,12 @@ def ask_openrouter(prompt, model="openai/gpt-3.5-turbo"):
         "model": model,
         "messages": [{"role": "user", "content": prompt}]
     }
-    response = requests.post(API_URL, headers=HEADERS, json=body)
-    response.raise_for_status()
-    return response.json()["choices"][0]["message"]["content"]
+    try:
+        response = requests.post(API_URL, headers=HEADERS, json=body)
+        response.raise_for_status()
+        return response.json()["choices"][0]["message"]["content"]
+    except requests.exceptions.RequestException as e:
+        return f"Request failed: {e}"
+    except KeyError:
+        return "Error: Invalid response structure"
+
