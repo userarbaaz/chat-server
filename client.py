@@ -2,7 +2,7 @@
 import os
 import requests
 
-API_KEY = os.environ.get("OPENROUTER_API_KEY")
+API_KEY = os.environ.get("OPENROUTER")
 
 if not API_KEY:
     raise ValueError("Missing OPENROUTER_API_KEY environment variable!")
