@@ -4,12 +4,15 @@ import requests
 
 API_KEY = os.environ.get("OPENROUTER_API_KEY")
 
+if not API_KEY:
+    raise ValueError("Missing OPENROUTER_API_KEY environment variable!")
+
 API_URL = "https://openrouter.ai/api/v1/chat/completions"
 
 HEADERS = {
     "Authorization": f"Bearer {API_KEY}",
     "Content-Type": "application/json",
-    "HTTP-Referer": "https://chat-server-oh2q.onrender.com",
+    "HTTP-Referer": "https://chat-server-oh2q.onrender.com",  # optional, good to have
     "X-Title": "ESP32Bot"
 }
 
