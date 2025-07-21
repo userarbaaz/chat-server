@@ -1,26 +1,34 @@
-from fastapi import FastAPI, Request
-from fastapi.middleware.cors import CORSMiddleware
-import uvicorn
+from fastapi import FastAPI
+from pydantic import BaseModel
+import requests
 import os
 
 app = FastAPI()
+API_KEY = os.environ.get("OPENROUTER")
+OPENROUTER_API_KEY =   API_KEY# Paste your actual key here
+MODEL = "openrouter/auto"
 
-# ✅ Allow requests from anywhere (ESP32, browsers, phones)
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],  
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
+class Message(BaseModel):
+    message: str
 
 @app.post("/api/bot")
-async def chat_bot(req: Request):
-    data = await req.json()
-    msg = data.get("message", "")
-    return {"response": f"You asked: {msg}"}  # Replace with AI logic if needed
+async def bot_endpoint(msg: Message):
+    headers = {
+        "Authorization": f"Bearer {OPENROUTER_API_KEY}",
+        "Content-Type": "application/json"
+    }
 
-# ✅ Run server on Render port (e.g., 10000+) instead of localhost:8000
-if __name__ == "__main__":
-    port = int(os.environ.get("PORT", 8000))
-    uvicorn.run("main:app", host="0.0.0.0", port=port)
+    data = {
+        "model": MODEL,
+        "messages": [
+            {"role": "user", "content": msg.message}
+        ]
+    }
+
+    try:
+        res = requests.post("https://openrouter.ai/api/v1/chat/completions", headers=headers, json=data)
+        res.raise_for_status()
+        response = res.json()["choices"][0]["message"]["content"]
+        return {"response": response}
+    except Exception as e:
+        return {"response": f"❌ Error: {str(e)}"}
