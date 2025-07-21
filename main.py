@@ -6,7 +6,7 @@ import os
 app = FastAPI()
 API_KEY = os.environ.get("OPENROUTER")
 OPENROUTER_API_KEY =   API_KEY# Paste your actual key here
-MODEL = "openrouter/auto"
+MODEL = "mistralai/mistral-7b-instruct:free"
 
 class Message(BaseModel):
     message: str
